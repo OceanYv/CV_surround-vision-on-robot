@@ -1,9 +1,9 @@
 #include "using_a_cam.hpp"
 
-    using_a_cam::using_a_cam(std::string cam_name, double height, double weight,bool window):
+    using_a_cam::using_a_cam(std::string cam_name, double weight, double height,bool window):
         cam_name_(cam_name),
-        height_(height),
         weight_(weight),
+        height_(height),
         window_(window),
         fresh_notic_flag_(false)
       {
@@ -24,8 +24,8 @@
         else 
             std::cout<<"camera at " << cam_name_ <<" can't be opened"<<std::endl;
 
-        capture_.set(3,height_);
-        capture_.set(4,weight_);
+        capture_.set(3,weight_);
+        capture_.set(4,height_);
 
         std::cout<<"--------------camera " << cam_name_ <<"-----------------"<<std::endl;
         std::cout<<"    宽度×高度：" << capture_.get(3)<<"*"<<capture_.get(4)<<std::endl;

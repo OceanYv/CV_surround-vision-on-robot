@@ -6,6 +6,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+//调整相机的编号
 #define front 0
 #define back 1
 #define left 2
