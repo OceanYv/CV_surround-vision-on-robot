@@ -50,7 +50,7 @@ int main(void)
         cv::imshow("picture_combine_send", combine);   //在窗口显示
         cv::waitKey(20); 
 
-        imwrite("./pic_save/1.jpg", combine);
+        imwrite("../bin/save_pic/1.jpg", combine);
         cv::waitKey(500); 
 
     }

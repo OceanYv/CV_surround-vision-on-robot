@@ -28,7 +28,10 @@ struct recvBuf
 	char buf[BLOCKSIZE];
 	int flag;
 };
- 
+
+struct sentbuf_lenth{
+	long unsigned int lenth;
+};
  
 class SocketMatTransmissionServer
 {
@@ -38,9 +41,13 @@ public:
 	int sockConn;
 private:
 	struct recvBuf data;
+	struct sentbuf_lenth data_inf;
+	int needrec1=sizeof(sentbuf_lenth);
+	unsigned char pic_data[500000];
  
 	int needRecv;
 	int count;
+	
  
 public:
  

@@ -28,6 +28,10 @@ struct sentbuf
 	char buf[BUFFER_SIZE];
 	int flag;			//是否为最后一个包的标志，2：为最后一个包，1：非最后一个包
 };
+
+struct sentbuf_lenth{
+	long unsigned int lenth;
+};
  
 class SocketMatTransmissionClient
 {
@@ -37,7 +41,10 @@ public:
  
 private:
 	int sockClient;
-	struct sentbuf data;	//缓存区
+	struct sentbuf data;
+	struct sentbuf_lenth data_inf;
+	int needsed1=sizeof(sentbuf_lenth);
+	unsigned char pic_data[500000];
  
 public:
  

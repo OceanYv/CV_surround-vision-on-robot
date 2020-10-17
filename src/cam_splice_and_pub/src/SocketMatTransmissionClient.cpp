@@ -36,30 +36,33 @@ int SocketMatTransmissionClient::transmit(cv::Mat image)
 		printf("empty image\n\n");
 		return -1;
 	}
- 
 	if(image.cols != IMG_WIDTH || image.rows != IMG_HEIGHT || image.type() != CV_8UC3){
 		printf("the image must satisfy : cols == IMG_WIDTH（%d）  rows == IMG_HEIGHT（%d） type == CV_8UC3\n\n", IMG_WIDTH, IMG_HEIGHT);
 		return -1;
 	}
- 
-	for(int k = 0; k < PACKAGE_NUM; k++) {
-		int num1 = IMG_HEIGHT / PACKAGE_NUM * k;		//该包发送的起始行
-		for (int i = 0; i < IMG_HEIGHT / PACKAGE_NUM; i++){	//i为该包发送的总行数
-			int num2 = i * IMG_WIDTH * 3;						//该包的字节数
-			uchar* ucdata = image.ptr<uchar>(i + num1);
-			for (int j = 0; j < IMG_WIDTH * 3; j++)
-				data.buf[num2 + j] = ucdata[j];
-		}
- 
-		if(k == PACKAGE_NUM - 1)			//最后一个包
-			data.flag = 2;
-		else
-			data.flag = 1;
- 
-		if (send(sockClient, (char *)(&data), sizeof(data), 0) < 0){
-			printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
-			return -1;
-		}
+
+	//编码，并存入数组pic_data
+	data_inf.lenth = 0;
+	std::vector<unsigned char> data_pic;
+	std::vector<int> param = std::vector<int>(2);
+	param[0] = 1;			//CV_IMWRITE_JPEG_QUALITY
+	param[1] = 80; 											// default(95) 0-100
+	cv::imencode(".jpg", image, data_pic,param);			//根据测试，800*600分辨率下，压缩后的大小在190000~450000范围内
+	//std::cout<<"压缩为jpg之后，大小为："<<data_pic.size()<<"        压缩率为："<<1.0*(data_pic.size())/(IMG_WIDTH*IMG_HEIGHT*3)<<std::endl;
+	for(std::vector<unsigned char> ::iterator it =data_pic.begin(); it !=data_pic.end();it++){
+		pic_data[data_inf.lenth] = *it;
+		data_inf.lenth++;
+	}
+
+	//发送数据
+	//std::cout<<"发送信息中的大小为："<<data_inf.lenth<<std::endl;
+	if (send(sockClient, (char *)(&data_inf),needsed1, 0) < 0){				//发送储存图片信息的结构体
+		printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
+		return -1;
+	}
+	if (send(sockClient, (char *)(pic_data), data_inf.lenth, 0) < 0){						//发送储存图片的结构体
+		printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
+		return -1;
 	}
 
 	return 1;
