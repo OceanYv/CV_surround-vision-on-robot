@@ -5,8 +5,8 @@
 int main(void)
 {
     cv::Mat combine1,combine2,combine;
-    cv::namedWindow("picture_combine_send",2);
-    int num=0;
+    //cv::namedWindow("picture_combine_send",2);
+    int num=1;
 
     using_a_cam cam_front("front",V_WIDTH,V_HEIGHT,false);
     using_a_cam cam_back("back",V_WIDTH,V_HEIGHT,false);
@@ -47,15 +47,15 @@ int main(void)
         hconcat(pic_front,pic_back,combine1);
         hconcat(pic_left,pic_right,combine2);
         vconcat(combine1,combine2,combine);
-        cv::imshow("picture_combine_send", combine);   //在窗口显示
-        cv::waitKey(20); 
+        //cv::imshow("picture_combine_send", combine);   //在窗口显示
+        //cv::waitKey(30); 
 
+        //std::cout<<"开始传输第"<< num <<"张图片"<<std::endl;
         socketMat.transmit(combine);
         //imwrite("../bin/save_pic/1.jpg", combine);
         cv::waitKey(20); 
-        
+        //std::cout<<"已发送"<< num <<"张图片"<<std::endl;
         num++;
-        std::cout<<"已发送"<< num <<"张图片"<<std::endl;
 
     }
     return 0;

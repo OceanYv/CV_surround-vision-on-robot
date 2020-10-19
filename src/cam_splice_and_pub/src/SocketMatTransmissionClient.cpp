@@ -38,32 +38,58 @@ int SocketMatTransmissionClient::transmit(cv::Mat image)
 	}
 	if(image.cols != IMG_WIDTH || image.rows != IMG_HEIGHT || image.type() != CV_8UC3){
 		printf("the image must satisfy : cols == IMG_WIDTH（%d）  rows == IMG_HEIGHT（%d） type == CV_8UC3\n\n", IMG_WIDTH, IMG_HEIGHT);
+		printf("the image is : cols == %d  rows == %d \n\n", image.cols, image.rows);
 		return -1;
 	}
 
 	//编码，并存入数组pic_data
-	data_inf.lenth = 0;
 	std::vector<unsigned char> data_pic;
 	std::vector<int> param = std::vector<int>(2);
 	param[0] = 1;			//CV_IMWRITE_JPEG_QUALITY
-	param[1] = 80; 											// default(95) 0-100
+	param[1] = 90; 											// default(95) 0-100
 	cv::imencode(".jpg", image, data_pic,param);			//根据测试，800*600分辨率下，压缩后的大小在190000~450000范围内，稳定网络下（100	M宽带）帧率可达13
 	//std::cout<<"压缩为jpg之后，大小为："<<data_pic.size()<<"        压缩率为："<<1.0*(data_pic.size())/(IMG_WIDTH*IMG_HEIGHT*3)<<std::endl;
-	for(std::vector<unsigned char> ::iterator it =data_pic.begin(); it !=data_pic.end();it++){
-		pic_data[data_inf.lenth] = *it;
-		data_inf.lenth++;
-	}
 
-	//发送数据
-	std::cout<<"发送信息中的大小为："<<data_inf.lenth<<std::endl;
+	//发送图片大小数据包
+	data_inf.lenth = data_pic.size();
+	int packnum = floor(1.0*data_inf.lenth/BUFFER_LEN);					//包的数量减一
+	//std::cout <<"发送信息中的大小为："<<data_inf.lenth<<",共需发送" << packnum+1 <<"个包"<<std::endl;
 	if (send(sockClient, (char *)(&data_inf),NEEDSED1, 0) < 0){				//发送储存图片信息的结构体
 		printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
 		return -1;
 	}
-	if (send(sockClient, (char *)(pic_data), data_inf.lenth, 0) < 0){						//发送储存图片的结构体
+
+	//发送图片内容数据包2
+	std::vector<unsigned char> ::iterator it=data_pic.begin();				//vector的迭代器
+	for(int i=0 ; i<packnum ; i++){												//发送前packnum个包
+		int p = 0;
+		while(p<BUFFER_LEN){												//填充包
+			pic_data[p] = *it;
+			it++;p++;
+		}
+		if (send(sockClient, (char *)(pic_data), BUFFER_LEN, 0) < 0){		//发送包
+			printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
+			return -1;
+		}
+		//std::cout << "    已发送" << i+1 <<"个包"<<std::endl;
+	}
+
+	//发送最后一个数据包
+	int last_num = data_inf.lenth%BUFFER_LEN;
+        //std::cout << "  最后一个包的大小为" << last_num<<std::endl;
+	for(int i=0;i<last_num;i++){				//填充最后一个包
+		pic_data[i] = *it;
+		it++;
+	}
+	if(it !=data_pic.end()){
+		printf("出错啦！！！\n");
+		return -1;
+	}
+	if (send(sockClient, (char *)(pic_data), last_num, 0) < 0){		//发送包
 		printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
 		return -1;
 	}
+	//std::cout << "    "<<packnum+1<<"个包发送完毕"<<std::endl;
 
 	return 1;
 }
