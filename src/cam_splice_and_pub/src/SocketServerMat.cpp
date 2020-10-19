@@ -12,6 +12,9 @@ int main()
 			cv::imshow("picture_combine_receive",image);
 			cv::waitKey(20);
 		}
+		else{
+			std::cout<<"通过socket获取图像失败！"<<std::endl;
+		}
 	}
  
 	socketMat.socketDisconnect();

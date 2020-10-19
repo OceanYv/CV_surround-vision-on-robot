@@ -5,25 +5,26 @@
 int main(void)
 {
     cv::Mat combine1,combine2,combine;
-    cv::namedWindow("camera",2);
+    cv::namedWindow("picture_combine_send",2);
+    int num=0;
 
     using_a_cam cam_front("front",V_WIDTH,V_HEIGHT,false);
     using_a_cam cam_back("back",V_WIDTH,V_HEIGHT,false);
     using_a_cam cam_left("left",V_WIDTH,V_HEIGHT,false);
     using_a_cam cam_right("right",V_WIDTH,V_HEIGHT,false); 
 
-    cv::Mat   Label1 = cv::imread("./pic/front.png",1);
-    cv::Mat   Label2 = cv::imread("./pic/back.png",1);
-    cv::Mat   Label3 = cv::imread("./pic/left.png",1);
-    cv::Mat   Label4 = cv::imread("./pic/right.png",1);
+    cv::Mat   Label1 = cv::imread("../bin/pic/front.png",1);
+    cv::Mat   Label2 = cv::imread("../bin/pic/back.png",1);
+    cv::Mat   Label3 = cv::imread("../bin/pic/left.png",1);
+    cv::Mat   Label4 = cv::imread("../bin/pic/right.png",1);
 
-    cv::Mat   Label1_mask = cv::imread("./pic/front.png",0);
-    cv::Mat   Label2_mask = cv::imread("./pic/back.png",0);
-    cv::Mat   Label3_mask = cv::imread("./pic/left.png",0);
-    cv::Mat   Label4_mask = cv::imread("./pic/right.png",0);
+    cv::Mat   Label1_mask = cv::imread("../bin/pic/front.png",0);
+    cv::Mat   Label2_mask = cv::imread("../bin/pic/back.png",0);
+    cv::Mat   Label3_mask = cv::imread("../bin/pic/left.png",0);
+    cv::Mat   Label4_mask = cv::imread("../bin/pic/right.png",0);
 
     SocketMatTransmissionClient socketMat;
-	if (socketMat.socketConnect("127.0.0.1", 6666) < 0)           //127.0.0.1  192.168.0.2
+	if (socketMat.socketConnect("192.168.0.2", 6666) < 0)           //127.0.0.1  192.168.0.2
 		return 0;
 
     while(1){
@@ -46,12 +47,15 @@ int main(void)
         hconcat(pic_front,pic_back,combine1);
         hconcat(pic_left,pic_right,combine2);
         vconcat(combine1,combine2,combine);
-        socketMat.transmit(combine);
         cv::imshow("picture_combine_send", combine);   //在窗口显示
         cv::waitKey(20); 
 
-        imwrite("../bin/save_pic/1.jpg", combine);
-        cv::waitKey(500); 
+        socketMat.transmit(combine);
+        //imwrite("../bin/save_pic/1.jpg", combine);
+        cv::waitKey(20); 
+        
+        num++;
+        std::cout<<"已发送"<< num <<"张图片"<<std::endl;
 
     }
     return 0;

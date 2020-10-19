@@ -20,14 +20,8 @@ using namespace cv;
 #define V_HEIGHT 600
 #define IMG_WIDTH (V_WIDTH*2)
 #define IMG_HEIGHT (V_HEIGHT*2)
-#define PACKAGE_NUM 8
-#define BUFFER_SIZE IMG_WIDTH*IMG_HEIGHT*3/PACKAGE_NUM		//默认格式为CV_8UC3
- 
-struct sentbuf
-{
-	char buf[BUFFER_SIZE];
-	int flag;			//是否为最后一个包的标志，2：为最后一个包，1：非最后一个包
-};
+#define NEEDSED1 8					//sizeof(sentbuf_lenth)
+#define BUFFER_LEN 10000			//分包发送时，每个包的大小
 
 struct sentbuf_lenth{
 	long unsigned int lenth;
@@ -41,10 +35,8 @@ public:
  
 private:
 	int sockClient;
-	struct sentbuf data;
 	struct sentbuf_lenth data_inf;
-	int needsed1=sizeof(sentbuf_lenth);
-	unsigned char pic_data[500000];
+	unsigned char pic_data[BUFFER_LEN];
  
 public:
  

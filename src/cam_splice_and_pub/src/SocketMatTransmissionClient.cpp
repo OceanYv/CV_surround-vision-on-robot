@@ -47,7 +47,7 @@ int SocketMatTransmissionClient::transmit(cv::Mat image)
 	std::vector<int> param = std::vector<int>(2);
 	param[0] = 1;			//CV_IMWRITE_JPEG_QUALITY
 	param[1] = 80; 											// default(95) 0-100
-	cv::imencode(".jpg", image, data_pic,param);			//根据测试，800*600分辨率下，压缩后的大小在190000~450000范围内
+	cv::imencode(".jpg", image, data_pic,param);			//根据测试，800*600分辨率下，压缩后的大小在190000~450000范围内，稳定网络下（100	M宽带）帧率可达13
 	//std::cout<<"压缩为jpg之后，大小为："<<data_pic.size()<<"        压缩率为："<<1.0*(data_pic.size())/(IMG_WIDTH*IMG_HEIGHT*3)<<std::endl;
 	for(std::vector<unsigned char> ::iterator it =data_pic.begin(); it !=data_pic.end();it++){
 		pic_data[data_inf.lenth] = *it;
@@ -55,8 +55,8 @@ int SocketMatTransmissionClient::transmit(cv::Mat image)
 	}
 
 	//发送数据
-	//std::cout<<"发送信息中的大小为："<<data_inf.lenth<<std::endl;
-	if (send(sockClient, (char *)(&data_inf),needsed1, 0) < 0){				//发送储存图片信息的结构体
+	std::cout<<"发送信息中的大小为："<<data_inf.lenth<<std::endl;
+	if (send(sockClient, (char *)(&data_inf),NEEDSED1, 0) < 0){				//发送储存图片信息的结构体
 		printf("send image error: %s(errno: %d)\n", strerror(errno), errno);
 		return -1;
 	}

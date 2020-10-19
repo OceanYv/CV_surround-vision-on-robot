@@ -20,14 +20,7 @@ using namespace cv;
 #define V_HEIGHT 600
 #define IMG_WIDTH (V_WIDTH*2)
 #define IMG_HEIGHT (V_HEIGHT*2)
-#define PACKAGE_NUM 8
-#define BLOCKSIZE IMG_WIDTH*IMG_HEIGHT*3/PACKAGE_NUM
- 
-struct recvBuf
-{
-	char buf[BLOCKSIZE];
-	int flag;
-};
+#define NEEDREC1 8			//sizeof(sentbuf_lenth)
 
 struct sentbuf_lenth{
 	long unsigned int lenth;
@@ -40,23 +33,15 @@ public:
 	~SocketMatTransmissionServer(void);
 	int sockConn;
 private:
-	struct recvBuf data;
 	struct sentbuf_lenth data_inf;
-	int needrec1=sizeof(sentbuf_lenth);
+	int pic_count;
 	unsigned char pic_data[500000];
- 
-	int needRecv;
-	int count;
-	
  
 public:
  
 	// 返回-1：连接失败，返回1，连接成功
 	int socketConnect(int PORT);
- 
-	// 传输图像
-	// return : -1		接收失败
-	//			1		接收成功
+
 	int receive(cv::Mat& image);
  
 	// 断开socket连接
