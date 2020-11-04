@@ -6,7 +6,7 @@ int main()
 	if (socketMat.socketConnect("192.168.0.2", 6666) < 0)
 		return 0;
 	
-	cv::VideoCapture capture(0);
+	cv::VideoCapture capture(2);
 	cv::Mat image;
 
 	capture.set(3,V_WIDTH);

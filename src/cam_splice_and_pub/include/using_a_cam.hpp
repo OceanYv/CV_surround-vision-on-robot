@@ -6,11 +6,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-//调整相机的编号
-#define front 0
-#define back 1
-#define left 2
-#define right 3
+#define FRONT 3
+#define BACK 2
+#define LEFT 1
+#define RIGHT 0
 
 class  using_a_cam
 {
@@ -26,7 +25,7 @@ class  using_a_cam
           *  window：是否创建输出窗口，可选择 true/false    
          *功能：打开对应摄像头、设置一个对应的窗口
          */
-        using_a_cam(std::string cam_name,double height , double weight,bool window);
+        using_a_cam(std::string cam_name,double width, double height,bool window);
     
         /*析构函数
           *功能：释放相机
@@ -45,11 +44,14 @@ class  using_a_cam
 
     private:
         int cam_num_;   //通过名称确定的相机编号
-        double height_,weight_;
+        double height_,width_;
         std::string cam_name_;          //如果对应不起来可以修改上方宏定义的值
         cv::VideoCapture capture_; 
         cv::Mat frame_;
         bool window_,fresh_notic_flag_;
+
+        std::string get_csi_pipeline(int cam_id,int width, int height, int fps);
+        std::string get_usb_pipeline(int cam_id,int width, int height, int fps);
 };
 
 #endif

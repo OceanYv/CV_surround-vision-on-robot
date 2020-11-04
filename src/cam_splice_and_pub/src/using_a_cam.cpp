@@ -1,31 +1,41 @@
 #include "using_a_cam.hpp"
 
-    using_a_cam::using_a_cam(std::string cam_name, double weight, double height,bool window):
+    using_a_cam::using_a_cam(std::string cam_name, double width, double height,bool window):
         cam_name_(cam_name),
-        weight_(weight),
         height_(height),
+        width_(width),
         window_(window),
         fresh_notic_flag_(false)
       {
         if(cam_name_ == "front")
-            cam_num_ = front;
+            cam_num_ =  FRONT;
         else if(cam_name_== "back")
-            cam_num_ = back;
+            cam_num_ = BACK;
         else if(cam_name_== "left")
-            cam_num_ = left;
+            cam_num_ = LEFT;
         else if(cam_name_ == "right")
-            cam_num_ = right;
-        else
+            cam_num_ = RIGHT;
+        else{
             std::cout<<"There is no such a camera named "<<cam_name_<<std::endl;
-            
-        capture_.open(cam_num_);
-        if(capture_.isOpened())  //打开摄像头
-            std::cout<<"camera at " << cam_name_ <<" is opened"<<std::endl;
-        else 
-            std::cout<<"camera at " << cam_name_ <<" can't be opened"<<std::endl;
+            return;
+        }
+        
+        //配置媒体流管道
+        std::string pipeline;
+        if(cam_num_ == FRONT || cam_num_ == BACK)
+            pipeline=get_usb_pipeline(cam_num_, width_, height_, 10);
+        else
+            pipeline=get_csi_pipeline(cam_num_, width_, height_, 10);
+	    std::cout << "Using pipeline: \n\t" << pipeline << "\n";
 
-        capture_.set(3,weight_);
-        capture_.set(4,height_);
+        //打开摄像头
+        capture_.open(pipeline, cv::CAP_GSTREAMER);
+        if(capture_.isOpened())  
+            std::cout<<"camera at " << cam_name_ <<" is opened"<<std::endl;
+        else {
+            std::cout<<"camera at " << cam_name_ <<" can't be opened"<<std::endl;
+            return;
+        }
 
         std::cout<<"--------------camera " << cam_name_ <<"-----------------"<<std::endl;
         std::cout<<"    宽度×高度：" << capture_.get(3)<<"*"<<capture_.get(4)<<std::endl;
@@ -65,3 +75,13 @@
 
         cv::waitKey(10); 
     }
+
+std::string using_a_cam::get_csi_pipeline(int cam_id,int width, int height, int fps) {
+    return "nvarguscamerasrc sensor-id="+ std::to_string(cam_id) +" ! video/x-raw(memory:NVMM), width=3264, height=2464, format=NV12, framerate=" + std::to_string(fps) + "/1 ! " +
+    "nvvidconv flip-method=0 ! video/x-raw, width="+ std::to_string(width) +", height="+ std::to_string(height) +", format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
+}
+
+std::string using_a_cam::get_usb_pipeline(int cam_id,int width, int height, int fps) {
+    return "v4l2src device=/dev/video"+ std::to_string(cam_id) +" ! video/x-raw, width="+std::to_string(width)+", height="+ std::to_string(height) +", format=YUY2, framerate=" + std::to_string(fps) + "/1 ! " +
+    "videoconvert ! video/x-raw, format=(string)BGR ! appsink";
+}

@@ -6,7 +6,7 @@ int main()
 	if (socketMat.socketConnect(6666) < 0)
 		return 0;
 	
-	cv::namedWindow("picture_combine_receive",2);
+	cv::namedWindow("picture_combine_receive",0);
 	cv::Mat image;
 	while (1){
 		if(socketMat.receive(image) > 0){
