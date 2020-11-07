@@ -16,15 +16,6 @@
  
 using namespace cv;
 
-/*1280*720 :最高10帧（0.4MB/帧-网速5MB/s）
-  1024*768 :最高10帧（0.32MB/帧）
-  800*600  :最高15帧（0.2MB/帧）
-  640*480  :最高20帧（0.14MB/帧）
- */
-#define V_WIDTH 1280
-#define V_HEIGHT 720
-#define IMG_WIDTH (V_WIDTH*2)
-#define IMG_HEIGHT (V_HEIGHT*2)
 #define NEEDREC1 8			//sizeof(sentbuf_lenth)
 #define BUFFER_LEN 10000
 

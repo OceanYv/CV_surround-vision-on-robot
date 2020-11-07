@@ -1,0 +1,35 @@
+<launch>
+
+    <!--设置相机的分辨率和帧率
+        根据测试： 
+            1280*720       ：10FPS  
+            1024*768       ：10FPS
+            800*600        ：20FPS
+        height weight 可选择：
+            3840*2160     1920*1080     1280*720    
+            2592*1944     2048*1536     1600*1200
+            1280*960      1024*768      800*600
+            640*480       320*240    
+        -->
+    <param name="cam_conf/width" value="1280"/>    
+    <param name="cam_conf/height" value="720"/>
+    <param name="cam_conf/fps" value="10"/>
+
+    <!--设置读取与保存图片的路径-->
+    <param name="pic_save_path" value="$(find splice_and_pub)/pic_save"/>
+    <param name="pic_pro_path" value="$(find splice_and_pub)/pic_provide"/>
+
+    <!--启动四个相机的节点,两个输入参数分别为相机名称、相机编号
+         相机名称可以自定义，相机编号必须为0-3，切不可重复
+    -->
+    <node name="read_and_pub_front" pkg="splice_and_pub" type="read_and_pub" args="front 2" output="screen"/>
+    <node name="read_and_pub_back" pkg="splice_and_pub" type="read_and_pub" args="back 3" output="screen"/>
+    <node name="read_and_pub_left" pkg="splice_and_pub" type="read_and_pub" args="left 1" output="screen"/>
+    <node name="read_and_pub_right" pkg="splice_and_pub" type="read_and_pub" args="right 0" output="screen"/>
+
+    <!--启动图像获取与拼接节点-->
+    <node name="ope_cam_by_class_client" pkg="splice_and_pub" type="ope_cam_by_class_client" output="screen">
+        <param name="cam_nums" value="4"/>          <!--打开相机的个数-->
+    </node>
+
+</launch>

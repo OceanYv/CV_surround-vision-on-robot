@@ -36,9 +36,8 @@ int SocketMatTransmissionClient::transmit(cv::Mat image)
 		printf("empty image\n\n");
 		return -1;
 	}
-	if(image.cols != IMG_WIDTH || image.rows != IMG_HEIGHT || image.type() != CV_8UC3){
-		printf("the image must satisfy : cols == IMG_WIDTH（%d）  rows == IMG_HEIGHT（%d） type == CV_8UC3\n\n", IMG_WIDTH, IMG_HEIGHT);
-		printf("the image is : cols == %d  rows == %d \n\n", image.cols, image.rows);
+	if(image.type() != CV_8UC3){
+		printf("the image must satisfy :type == CV_8UC3\n\n");
 		return -1;
 	}
 

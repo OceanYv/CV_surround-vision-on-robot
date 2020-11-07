@@ -1,5 +1,8 @@
 #include "SocketMatTransmissionClient.h"
  
+#define V_WIDTH 800
+#define V_HEIGHT 600
+
 int main()
 {
 	SocketMatTransmissionClient socketMat;
@@ -10,7 +13,7 @@ int main()
 	cv::Mat image;
 
 	capture.set(3,V_WIDTH);
-        capture.set(4,V_HEIGHT);
+    capture.set(4,V_HEIGHT);
  
 	while (1){
 		if (!capture.isOpened())
