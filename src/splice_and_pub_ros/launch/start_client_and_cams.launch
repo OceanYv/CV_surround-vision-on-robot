@@ -1,5 +1,10 @@
 <launch>
 
+    <!--TCP/IP通讯的参数-->
+    <param name="/tcp/ip" value="192.168.0.1"/>
+    <param name="/tcp/port" value="6666"/>
+    <param name="/tcp/waitime" value="-1"/>        <!--客户端等待与服务器建立连接的时间。若为-1，则无限时间等待-->
+
     <!--设置相机的分辨率和帧率
         根据测试： 
             1280*720       ：10FPS  
@@ -29,7 +34,7 @@
 
     <!--启动图像获取与拼接节点-->
     <node name="ope_cam_by_class_client" pkg="splice_and_pub" type="ope_cam_by_class_client" output="screen">
-        <param name="cam_nums" value="4"/>          <!--打开相机的个数-->
+        <param name="cam_nums" value="4"/>          <!--打开相机的geshu-->
     </node>
 
 </launch>

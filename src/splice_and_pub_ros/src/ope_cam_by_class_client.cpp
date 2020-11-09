@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
 
     double width,height;
     cv::Mat combine1,combine2,combine;
-    int num=1,cam_nums;
-    std::string pro_path,save_path;
+    int num=1,cam_nums,port;
+    std::string pro_path,save_path,ip;
 
     //cv::namedWindow("picture_combine_send",2);
     //std::cout<<"create the window"<<std::endl;
@@ -51,9 +51,11 @@ int main(int argc, char *argv[])
     //读取参数服务器（图像大小）
     nh.param("/cam_conf/width",width,1280.0);
     nh.param("/cam_conf/height",height,720.0);
-    nh.param("cam_nums",cam_nums,4);
+    nh.param("/ope_cam_by_class_client/cam_nums",cam_nums,4);
+    nh.param("/tcp/port",port,6666);
     nh.param<std::string>("/pic_pro_path",pro_path,"/home/zju128");
     nh.param<std::string>("/pic_save_path",save_path,"/home/zju128");
+    nh.param<std::string>("/tcp/ip",ip,"192.168.0.1");
     //std::cout<<"already read params"<<std::endl;
 
     //创建订阅者
@@ -73,16 +75,23 @@ int main(int argc, char *argv[])
     cv::Mat   Label2_mask = cv::imread(pro_path+"/back.png",0);
     cv::Mat   Label3_mask = cv::imread(pro_path+"/left.png",0);
     cv::Mat   Label4_mask = cv::imread(pro_path+"/right.png",0);
-    //std::cout<<"already read label pictures"<<std::endl;
+
+    //无画面窗口的图像显示
+    cv::Mat   no_picture = cv::imread(pro_path+"/no_picture.jpg",1);
+    cv::resize(no_picture,no_picture,Size(width,height));
+    pic_front=pic_back=pic_left=pic_right=no_picture;
+    std::cout<<"already read white pictures"<<std::endl;
 
     SocketMatTransmissionClient socketMat;
-	if (socketMat.socketConnect("192.168.0.1", 6666) < 0)           //127.0.0.1  192.168.0.2
+	if (socketMat.socketConnect(ip.c_str(),port) < 0)           //127.0.0.1  192.168.0.2
 		return 0;
 
     while(nh.ok()){
         ros::spinOnce();
-	int flagsum=updateflag[0]+updateflag[1]+updateflag[2]+updateflag[3];
-        //四个相机的图片都完成了更新
+	    int flagsum=updateflag[0]+updateflag[1]+updateflag[2]+updateflag[3];
+	    //std::cout<<updateflag[0]<<" "<<updateflag[1]<<" "<<updateflag[2]<<" "<<updateflag[3]<<std::endl;
+
+        //相机的图片都完成了更新
         if(flagsum == cam_nums){
             cv::Mat imageROI1 = pic_front(cv::Rect(width-100, height-70, 100, 70));
             cv::Mat imageROI2 = pic_back(cv::Rect(width-100, height-70, 100, 70));
@@ -100,13 +109,19 @@ int main(int argc, char *argv[])
             //cv::waitKey(25);  
 
             //std::cout<<"开始传输第"<< num <<"张图片"<<std::endl;
-            socketMat.transmit(combine);
-            //imwrite(save_path+"/combine.jpg", combine);
-            //std::cout<<"已传输"<< num <<"张图片"<<std::endl;
+            int ret=socketMat.transmit(combine);
+            if(ret == -1)
+                std::cout<<"遇到了一些错误！！"<<std::endl;
+            else if(ret == 2)
+                std::cout<<"与服务器的链接发生错误，但是已经重新建立！"<<std::endl;
+            else{
+                //imwrite(save_path+"/combine.jpg", combine);
+                //std::cout<<"已传输"<< num <<"张图片"<<std::endl;
+                num++;
+            }
             updateflag[0]=updateflag[1]=updateflag[2]=updateflag[3]=0;
-	    num++;
         }
     }
     cv::destroyWindow("picture_combine_send");
-    return 0;
+    return 1;
 }

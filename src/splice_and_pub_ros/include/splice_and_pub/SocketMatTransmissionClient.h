@@ -31,8 +31,13 @@ public:
  
 private:
 	int sockClient;
+	ros::NodeHandle nh_;
+	struct sockaddr_in servaddr;
 	struct sentbuf_lenth data_inf;
 	unsigned char pic_data[BUFFER_LEN];
+
+	// 断开之后重建链接
+	int reconnect(void);
  
 public:
  
