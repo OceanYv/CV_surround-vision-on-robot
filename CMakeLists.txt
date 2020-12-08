@@ -9,8 +9,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories("/usr/include/eigen3")
 include_directories(./include)
 
-#add_subdirectory(./srccode_from_csdn)
-add_subdirectory(./src/cam_splice_and_pub)
+add_subdirectory(./src/rec_as_client)
+#add_subdirectory(./src/rec_as_server)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
