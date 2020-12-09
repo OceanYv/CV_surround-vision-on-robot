@@ -35,23 +35,18 @@ private:
 	unsigned char pic_data[BUFFER_LEN];
  
 public:
- 	/*建立连接，或断连后重新建立连接
-	 *	输入值flag:
-	 *		１:建立一个新的链接；
-	 *		２:重建当前链接；
-	 *  返回值：客户端的套接字
-	 */
-	int connect(int flag);
-
-	//绑定端口，获取服务器套接字，成功返回1，失败返回-1
+	// 服务器绑定套接字与端口
 	int serverbind(int PORT);
+
+ 	// 建立连接，成功返回客户端套接字，失败返回-1
+	int connect(void);
  
-	// 向指定客户端传输图像，成功返回1，失败返回-1
-	int transmit(int sockClient,cv::Mat image);
+	// 传输图像，成功返回1，失败返回-1
+	int transmit(int sockClient,std::vector<unsigned char> &data_pic);
 
 	// 断开socket连接
-	void socketDisconnect(int sockClient);//客户端
-	void socketrelease(void);//服务器
+	void socketDisconnect(int sockClient);
+	void socketrelease(void);
 };
  
 #endif
